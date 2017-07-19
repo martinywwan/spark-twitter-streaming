@@ -13,13 +13,16 @@ import twitter4j.conf.ConfigurationBuilder;
  * Created by Martin (Yew Wing) Wan on 19-Jul-17.
  */
 public class SparkApplication {
+
+    public static final String[] FILTERS = new String[] {"spark","apache", "hadoop"}; //filter tweets
+
     public static void main(String[] args) throws Exception {
         if(args.length!=4) {
             throw new Exception("Expecting 4 arguments \n" +
-                    "args1: consumerKey\n" +
-                    "args2: consumerSecret\n" +
-                    "args3: accessToken\n"+
-                    "args4: accessTokenSecret");
+                    "args0: consumerKey\n" +
+                    "args1: consumerSecret\n" +
+                    "args2: accessToken\n"+
+                    "args3: accessTokenSecret");
         }
 
         SparkDriver sparkFactory = new SparkDriver("TwitterApplication");
@@ -29,14 +32,14 @@ public class SparkApplication {
         String accessTokenSecret = args[3];
 
         ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true).setOAuthConsumerKey(consumerKey)
+        cb.setDebugEnabled(false).setOAuthConsumerKey(consumerKey)
                 .setOAuthConsumerSecret(consumerSecret)
                 .setOAuthAccessToken(accessToken)
                 .setOAuthAccessTokenSecret(accessTokenSecret);
 
         OAuthAuthorization auth = new OAuthAuthorization(cb.build());
-        JavaStreamingContext javaStreamingContext = new JavaStreamingContext(sparkFactory.getConf(), new Duration(1000));
-        JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(javaStreamingContext, auth);
-        new SparkSubscriber(stream);
+        JavaStreamingContext javaStreamingContext = new JavaStreamingContext(sparkFactory.getConf(), new Duration(5000));
+        JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(javaStreamingContext, auth, FILTERS); //Twitter stream
+        new SparkSubscriber(javaStreamingContext, stream);
     }
 }

@@ -13,7 +13,8 @@ public class SparkDriver {
     public SparkDriver(String applicationName){
         //Standalone application
          conf = new SparkConf()
-                 .setMaster("local[*]") //comment to run in hadoop cluster
+                 .set("rootCategory","ERROR")
+                 .setMaster("local[*]") //comment to run in Hadoop cluster
                  .setAppName(applicationName).set("spark.driver.allowMultipleContexts", "true");
     }
 
