@@ -3,7 +3,7 @@
 ## Synopsis <br />
 <br />
 Simple Spark application that connects to Twitter and prints twitter messages based on a filter (if any). <br />
-The Spark application can be run as a Standalone application or on Hadoop. <br />
+The Spark application can be run as a Standalone Application or on Hadoop. <br />
 <br />
 ## Motivation <br />
 <br />
@@ -17,6 +17,6 @@ Instructions to run the application using an IDE: <br />
 <br />
 Instructions to run the application on the command line: <br />
 1) Ensure maven is installed and enter "mvn clean package" <br />
-2) In the target folder, you should see a jar file with dependencies. Run "java -jar [generated_jar].jar [args0 - consumerKey] [args1 - consumerSecret] [args2 - accessToken] [args3 - accessTokenSecret <br />
+2) In the target folder, you should see a jar file with dependencies. Run "java -jar [generated_jar].jar [args0 - consumerKey] [args1 - consumerSecret] [args2 - accessToken] [args3 - accessTokenSecret] <br />
 <br />
 <br />
