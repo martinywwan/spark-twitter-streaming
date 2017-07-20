@@ -1,12 +1,15 @@
+import driver.TwitterDriver;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.twitter.TwitterUtils;
-import spark.SparkDriver;
+import driver.SparkDriver;
 import spark.SparkSubscriber;
 import twitter4j.Status;
 import twitter4j.auth.OAuthAuthorization;
-import twitter4j.conf.ConfigurationBuilder;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
 
 /**Subscribes to Twitter using Spark Streaming
  *
@@ -14,7 +17,37 @@ import twitter4j.conf.ConfigurationBuilder;
  */
 public class SparkApplication {
 
-    public static final String[] FILTERS = new String[] {"spark","apache", "hadoop"}; //filter tweets
+    public static final String[] FILTERS = new String[] {"chesterbennington", "rip", "youareamazing"}; //filter tweets
+    private final SparkDriver sparkFactory;
+    private final TwitterDriver twitterDriver;
+    private final JavaReceiverInputDStream<Status> stream;
+    private final JavaStreamingContext javaStreamingContext;
+    private final SparkSubscriber sparkSubscriber;
+
+
+    static {
+        Logger.getLogger("org").setLevel(Level.OFF); //remove debug logs
+        Logger.getLogger("akka").setLevel(Level.OFF); //remove debug logs
+    }
+
+    //Initialises Spark and Twitter connection
+    public SparkApplication(String ... args){
+        this.sparkFactory = new SparkDriver("TwitterApplication");
+        this.twitterDriver = new TwitterDriver(args);
+        OAuthAuthorization auth = new OAuthAuthorization(this.twitterDriver.getConfig().build());
+        this.javaStreamingContext = new JavaStreamingContext(this.sparkFactory.getConf(), new Duration(5000));
+        //TODO - filters defined in a properties file
+        this.stream = FILTERS.length!=0? TwitterUtils.createStream(javaStreamingContext, auth, FILTERS) : TwitterUtils.createStream(javaStreamingContext, auth); //Twitter stream
+        this.sparkSubscriber = new SparkSubscriber(javaStreamingContext, stream);
+    }
+
+    /**Gets tweets
+     *
+     * @throws InterruptedException
+     */
+    public void run() throws InterruptedException {
+        this.sparkSubscriber.getTweets();
+    }
 
     public static void main(String[] args) throws Exception {
         if(args.length!=4) {
@@ -24,22 +57,7 @@ public class SparkApplication {
                     "args2: accessToken\n"+
                     "args3: accessTokenSecret");
         }
-
-        SparkDriver sparkFactory = new SparkDriver("TwitterApplication");
-        String consumerKey = args[0];
-        String consumerSecret = args[1];
-        String accessToken =  args[2];
-        String accessTokenSecret = args[3];
-
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(false).setOAuthConsumerKey(consumerKey)
-                .setOAuthConsumerSecret(consumerSecret)
-                .setOAuthAccessToken(accessToken)
-                .setOAuthAccessTokenSecret(accessTokenSecret);
-
-        OAuthAuthorization auth = new OAuthAuthorization(cb.build());
-        JavaStreamingContext javaStreamingContext = new JavaStreamingContext(sparkFactory.getConf(), new Duration(5000));
-        JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(javaStreamingContext, auth, FILTERS); //Twitter stream
-        new SparkSubscriber(javaStreamingContext, stream);
+        SparkApplication sparkApplication = new SparkApplication(args);
+        sparkApplication.run();
     }
 }

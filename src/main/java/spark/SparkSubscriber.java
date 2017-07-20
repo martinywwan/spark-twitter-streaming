@@ -4,26 +4,45 @@ import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import twitter4j.Status;
 
+import java.util.Arrays;
+
 /**Subscribes to Twitter messages
  *
  *Created by Martin (Yew Wing) Wan
  */
 public class SparkSubscriber {
 
-    public SparkSubscriber(JavaStreamingContext javaStreamingContext, JavaReceiverInputDStream<Status> stream) throws InterruptedException {
-        stream.map(status -> {
-                System.out.println("Tweet: " + status.getText());
-                return status.getText();
-            }).foreachRDD(rdd -> {
-                    rdd.foreachPartition(itr -> {
-                        while(itr.hasNext()){
-                            System.out.println("Sub-Tweet: " + itr.next());
-                        }
-                    });
-               });
+    private final JavaStreamingContext javaStreamingContext;
+    private final JavaReceiverInputDStream<Status> stream;
+
+    public SparkSubscriber(JavaStreamingContext javaStreamingContext, JavaReceiverInputDStream<Status> stream) {
+        this.javaStreamingContext = javaStreamingContext;
+        this.stream = stream;
+    }
+
+    //Gets the twitter message and prints the tweet and user details
+    //TODO - Write to HDFS for analytics
+    public void getTweets() throws InterruptedException {
+        this.stream.map(msg -> msg).foreachRDD(rdd -> {
+            rdd.foreachPartition(partition -> {
+                while (partition.hasNext()) {
+                    Status status = partition.next();
+                    String tweet = status.getText();
+                    Arrays.stream(status.getHashtagEntities()).forEach(System.out::print);
+                    String details = "User: " + status.getUser() + "\n*************************************";
+
+                    if(tweet.startsWith("RT")) {
+                        System.out.println("ReTweet: " + tweet + "\n" + details);
+                    } else {
+                        System.out.println("Tweet: " + tweet + "\n" + details);
+                    }
+//                    Arrays.stream(status.getHashtagEntities()).forEach(System.out::print);
+                }
+            });
+        });
 
         System.out.println("-Starting Spark Streaming-");
-        javaStreamingContext.start(); //start streaming
-        javaStreamingContext.awaitTermination(); //continue until killed
+        this.javaStreamingContext.start(); //start streaming
+        this.javaStreamingContext.awaitTermination(); //continue until killed
     }
 }

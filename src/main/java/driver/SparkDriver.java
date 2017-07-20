@@ -1,4 +1,4 @@
-package spark;
+package driver;
 
 import org.apache.spark.SparkConf;
 
@@ -13,7 +13,6 @@ public class SparkDriver {
     public SparkDriver(String applicationName){
         //Standalone application
          conf = new SparkConf()
-                 .set("rootCategory","ERROR")
                  .setMaster("local[*]") //comment to run in Hadoop cluster
                  .setAppName(applicationName).set("spark.driver.allowMultipleContexts", "true");
     }
