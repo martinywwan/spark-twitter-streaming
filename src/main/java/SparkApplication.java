@@ -11,19 +11,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 
 
-/**Subscribes to Twitter using Spark Streaming
+/**Simple Spark streaming application used to subscribe to Twitter messages
  *
  * Created by Martin (Yew Wing) Wan on 19-Jul-17.
  */
 public class SparkApplication {
 
     public static final String[] FILTERS = new String[] {"chesterbennington", "rip", "youareamazing"}; //filter tweets
-    private final SparkDriver sparkFactory;
-    private final TwitterDriver twitterDriver;
-    private final JavaReceiverInputDStream<Status> stream;
-    private final JavaStreamingContext javaStreamingContext;
     private final SparkSubscriber sparkSubscriber;
-
 
     static {
         Logger.getLogger("org").setLevel(Level.OFF); //remove debug logs
@@ -32,16 +27,16 @@ public class SparkApplication {
 
     //Initialises Spark and Twitter connection
     public SparkApplication(String ... args){
-        this.sparkFactory = new SparkDriver("TwitterApplication");
-        this.twitterDriver = new TwitterDriver(args);
-        OAuthAuthorization auth = new OAuthAuthorization(this.twitterDriver.getConfig().build());
-        this.javaStreamingContext = new JavaStreamingContext(this.sparkFactory.getConf(), new Duration(5000));
+        SparkDriver sparkDriver = new SparkDriver("TwitterApplication"); //setup Spark
+        TwitterDriver twitterDriver = new TwitterDriver(args); //define Twitter configuration
+        OAuthAuthorization auth = new OAuthAuthorization(twitterDriver.getConfig().build()); //setup Twitter connection
+        JavaStreamingContext javaStreamingContext = new JavaStreamingContext(sparkDriver.getConf(), new Duration(5000)); //set streamingContext using Spark
         //TODO - filters defined in a properties file
-        this.stream = FILTERS.length!=0? TwitterUtils.createStream(javaStreamingContext, auth, FILTERS) : TwitterUtils.createStream(javaStreamingContext, auth); //Twitter stream
+        JavaReceiverInputDStream<Status> stream = FILTERS.length!=0? TwitterUtils.createStream(javaStreamingContext, auth, FILTERS) : TwitterUtils.createStream(javaStreamingContext, auth); //Twitter stream
         this.sparkSubscriber = new SparkSubscriber(javaStreamingContext, stream);
     }
 
-    /**Gets tweets
+    /**Gets Twitter messages (Tweets)
      *
      * @throws InterruptedException
      */

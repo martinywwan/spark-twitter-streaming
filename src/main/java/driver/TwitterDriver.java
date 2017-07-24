@@ -4,7 +4,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 /**Initialises the Twitter connection
  *
- * Created by lightwan on 20-Jul-17.
+ * Created by Martin (Yew Wing) Wan on 20-Jul-17.
  */
 public class TwitterDriver {
 

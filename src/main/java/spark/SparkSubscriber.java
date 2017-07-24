@@ -15,12 +15,17 @@ public class SparkSubscriber {
     private final JavaStreamingContext javaStreamingContext;
     private final JavaReceiverInputDStream<Status> stream;
 
+    /**Constructor - Java Streaming context using Spark and Twitter stream
+     *
+     * @param javaStreamingContext - Spark stream
+     * @param stream - Twitter stream
+     */
     public SparkSubscriber(JavaStreamingContext javaStreamingContext, JavaReceiverInputDStream<Status> stream) {
         this.javaStreamingContext = javaStreamingContext;
         this.stream = stream;
     }
 
-    //Gets the twitter message and prints the tweet and user details
+    //Gets the twitter message and prints the Tweet and user details
     //TODO - Write to HDFS for analytics
     public void getTweets() throws InterruptedException {
         this.stream.map(msg -> msg).foreachRDD(rdd -> {
