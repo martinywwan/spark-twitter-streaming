@@ -1,15 +1,19 @@
-### java-spark-twitter-streaming <br />
+java-spark-twitter-streaming <br />
+=============
 <br />
-## Synopsis <br />
+Synopsis <br />
+---------------
 <br />
 Simple Spark application that connects to Twitter and prints twitter messages based on a filter (if any). <br />
 The Spark application can be run as a Standalone Application or on Hadoop. <br />
 <br />
-## Motivation <br />
+Motivation <br />
+---------------
 <br />
 The motivation behind this project was to provide support to developers and researchers in connecting to Twitter using Apache Spark. <br />
 <br />
-## Execution <br />
+Execution <br />
+---------------
 <br />
 Prerequisites: <br />
 1)If you are running on Hadoop, ensure ${HADOOP_CONF_DIR} and ${HADOOP_HOME} are set
