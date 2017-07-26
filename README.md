@@ -21,7 +21,7 @@ Prerequisites: <br />
 <br />
 Instructions to run the application using an IDE: <br />
 1) Edit the run configuration to include the following arguments: [args0 - consumerKey] [args1 - consumerSecret] [args2 - accessToken] [args3 - accessTokenSecret] <br />
-2) Run the SparkApplication class  (Optional: edit the FILTERS array to filter out the tweets received) <br />
+2) Run the SparkApplication class - Main method is located here (Optional: edit the FILTERS array to filter out the tweets received) <br />
 <br />
 Instructions to run the application on the command line: <br />
 1) Ensure maven is installed and enter "mvn clean package" <br />
