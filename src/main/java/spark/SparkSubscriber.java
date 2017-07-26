@@ -33,7 +33,7 @@ public class SparkSubscriber {
                 while (partition.hasNext()) {
                     Status status = partition.next();
                     String tweet = status.getText();
-                    Arrays.stream(status.getHashtagEntities()).forEach(System.out::print);
+                    Arrays.stream(status.getHashtagEntities()).forEach(System.out::println);
                     String details = "User: " + status.getUser() + "\n*************************************";
 
                     if(tweet.startsWith("RT")) {
